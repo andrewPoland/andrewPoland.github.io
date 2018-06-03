@@ -3,7 +3,13 @@ it's so easy to get stuck because you missed a single step but if you're just af
 
 So first things first make sure you have a copy of visual studio 2017 installed, pervious versions do not support the project template for azure functions. For the purpose of this article I was using a community edition but any edition should work the same. When I first tried to create an azure function project in visual studio I found I hadn't installed the azure tools so the template didn't exist inside the new project wizard. No worries there's a link on the new project wizard which opens the visual studio installer, from here I just needed to select the azure development workflow.
 
-Once that was installed when I search "azure function" in the new project wizard it shows up and I'm then able to create an azure function project. At the time of writing this the wizard does not provide a service bus topic option so you'll have to create an empty project and then you can right click -> add new function and select service bus topic from the list. This will create something similar to the following, one change that I made was to use the `Microsoft.Extensions.ILogger` instead of the `TraceWriter`. The Microsoft team appear to be working on a way to utilize dependency injection but that might be a while off but it doesn't stop us from setting up our code to handle it when it is supported.
+[!Azure function missing in wizard](/Assets/AzureFunctions/Images/FunctionSearch.png)
+
+Once that was installed when I search "azure function" in the new project wizard it shows up and I'm then able to create an azure function project. At the time of writing this the wizard does not provide a service bus topic option so you'll have to create an empty project and then you can right click -> add new function and select service bus topic from the list.
+
+[!Azure function missing in wizard](/Assets/AzureFunctions/Images/ServiceBusFunctionWizard.png)
+
+This will create something similar to the following, one change that I made was to use the `Microsoft.Extensions.ILogger` instead of the `TraceWriter`. The Microsoft team appear to be working on a way to utilize dependency injection but that might be a while off but it doesn't stop us from setting up our code to handle it when it is supported.
 
 ```C#
     public static class ServiceBusReader
@@ -43,7 +49,7 @@ Once that was installed when I search "azure function" in the new project wizard
     }
 ```
 
-Azure functions use a local file called local.settings.json, this allows you to define AppSettings, connectionStrings and custom host.json configuration when running locally. This file doesn't get uploaded to azure and it doesn't get checked into source control. This ensures that developers aren't going to check in any passwords to source control which is a great move in my opinion. It would be nice to have a settings.schema.json which contained a definition for what the settings should look like but putting this stuff in a readme should be fine for now.
+Azure functions use a local file called local.settings.json, this allows you to define AppSettings, connectionStrings and custom host.json configuration when running locally. This file doesn't get uploaded to azure and it doesn't get checked into source control. This ensures that developers aren't going to check in any passwords to source control which is a great move in my opinion. It would be nice to have a settings.schema.json which contained a definition for what the settings should look like but putting this stuff in a readme works for now.
 
 In order to get the code to work I needed to modify the local.settings.json file to provide the "ServiceBusConnectionString" parameter, this parameter has to be added under the Values section and match the `Connection` parameter passed into the `ServiceBusTrigger` attribute. I also added a host property, the host property allows you to define custom host configuration while running locally, in this we've set that we only want to run a single function at a time and that we want to use the ILogger for information and error calls. The host parameters configuration if desired inside the azure environment should be placed inside the host.json file.
 
@@ -54,6 +60,8 @@ Success, I now have a function running on my local machine on port 7071, now all
 Url | http://localhost{port}/admin/functions/{functionName}
 Body | ``` { "input": "test plain text message" } ```
 ContentType | application/json        
+
+[!Azure function missing in wizard](/Assets/AzureFunctions/Images/PlainTextPostman.png)
 
 This should cause the console from the running azure function to output a message. You now have tested that the function is running locally and you're able to trigger the code within it. It is possible to use a custom class as a parameter to your azure function and it will get deserialized before your code is called but that requires the message to be sent to the service bus in a particular format, so for now I'm going to concentrate on getting a `byte[]`. Another reason for not using a custom object is that you might find you don't want to use Json for serializing your data but rather a non human readable format to reduce your message size.
 
