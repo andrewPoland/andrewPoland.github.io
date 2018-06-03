@@ -3,7 +3,7 @@ it's so easy to get stuck because you missed a single step but if you're just af
 
 So first things first make sure you have a copy of visual studio 2017 installed, pervious versions do not support the project template for azure functions. For the purpose of this article I was using a community edition but any edition should work the same. When I first tried to create an azure function project in visual studio I found I hadn't installed the azure tools so the template didn't exist inside the new project wizard. No worries there's a link on the new project wizard which opens the visual studio installer, from here I just needed to select the azure development workflow.
 
-![Azure function missing in wizard](/Assets/AzureFunctions/Images/FunctionSearch.png)
+![Azure function missing in wizard](/Assets/AzureFunctions/Images/Function Search.png)
 
 Once that was installed when I search "azure function" in the new project wizard it shows up and I'm then able to create an azure function project. At the time of writing this the wizard does not provide a service bus topic option so you'll have to create an empty project and then you can right click -> add new function and select service bus topic from the list.
 
