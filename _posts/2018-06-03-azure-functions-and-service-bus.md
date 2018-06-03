@@ -21,6 +21,11 @@ This will create something similar to the following, one change that I made was 
         }
     }
 ```
+
+Azure functions use a local file called local.settings.json, this allows you to define AppSettings, connectionStrings and custom host.json configuration when running locally. This file doesn't get uploaded to azure and it doesn't get checked into source control. This ensures that developers aren't going to check in any passwords to source control which is a great move in my opinion. It would be nice to have a settings.schema.json which contained a definition for what the settings should look like but putting this stuff in a readme works for now.
+
+In order to get the code to work I needed to modify the local.settings.json file to provide the "ServiceBusConnectionString" parameter, this parameter has to be added under the Values section and match the `Connection` parameter passed into the `ServiceBusTrigger` attribute. I also added a host property, the host property allows you to define custom host configuration while running locally, in this we've set that we only want to run a single function at a time and that we want to use the `ILogger` for information and error calls. The host parameters configuration if desired inside the azure environment should be placed inside the `host.json` file.
+
 ```JSON
     {
         "IsEncrypted": false,
@@ -48,10 +53,6 @@ This will create something similar to the following, one change that I made was 
         }
     }
 ```
-
-Azure functions use a local file called local.settings.json, this allows you to define AppSettings, connectionStrings and custom host.json configuration when running locally. This file doesn't get uploaded to azure and it doesn't get checked into source control. This ensures that developers aren't going to check in any passwords to source control which is a great move in my opinion. It would be nice to have a settings.schema.json which contained a definition for what the settings should look like but putting this stuff in a readme works for now.
-
-In order to get the code to work I needed to modify the local.settings.json file to provide the "ServiceBusConnectionString" parameter, this parameter has to be added under the Values section and match the `Connection` parameter passed into the `ServiceBusTrigger` attribute. I also added a host property, the host property allows you to define custom host configuration while running locally, in this we've set that we only want to run a single function at a time and that we want to use the `ILogger` for information and error calls. The host parameters configuration if desired inside the azure environment should be placed inside the `host.json` file.
 
 After I got this setup the first step was to get it running on my local machine to trigger the function I used postman. I had hoped to set this up without using an actual azure service bus property but unfortunately it doesn't look like there's an emulator for the service bus currently. The function seems to requires a valid connection string, since the initialization checks for null and empty strings, even passing fake values resulted in further validation errors. I ended up giving in and adding an actual service bus connection string but if there's a way to fake this please let me know.
 
