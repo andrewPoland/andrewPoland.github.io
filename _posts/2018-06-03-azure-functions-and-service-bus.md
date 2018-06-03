@@ -112,15 +112,15 @@ I then need to update my postman content to match this new data type as follows,
 
 that's all I want to have functionally for this function so now that we've tested it's triggering from our http test it's time to trigger off the actual service bus.
 
-In order to send messages to my Azure service bus topic I want to use postman so I can trigger my local function through the admin portal or service bus from a single location. unfortunately it's not the simplest process, in order to authenticate with the service bus REST api you need a Shared Access Signature (SAS). The azure portal has a feature to create one of these for an Azure storage account but I couldn't find anything to do this for the service bus. Shared Access Signatures aren't simple and are deserving of their own post but I ended up making a console application based off [this project](https://code.msdn.microsoft.com/Using-Shared-Access-e605b37c/sourcecode?fileId=91232&pathId=148562433) that generates signatures.
+In order to send messages to my Azure service bus topic I want to use postman so I can trigger my local function through the admin portal or service bus from a single location. unfortunately it's not the simplest process, in order to authenticate with the service bus REST API you need a Shared Access Signature (SAS). The azure portal has a feature to create one of these for an Azure storage account but I couldn't find anything to do this for the service bus. Shared Access Signatures aren't simple and are deserving of their own post but I ended up making a console application based off [this project](https://code.msdn.microsoft.com/Using-Shared-Access-e605b37c/sourcecode?fileId=91232&pathId=148562433) that generates signatures.
 
 ![Final triggered local function](/Assets/AzureFunctions/Images/ServiceBusFormatPostman.png)
 
-With signature in hand I could create a simple postman call which would add one to many messages on my topic, this results in triggering the function locally. I've now confirmed my function can be triggered from both the service bus and from local http triggers. In my next post I plan on going through how to automate the setup of code base with azure to automate the depoyment and testing of the function in azure.
+With signature in hand I could create a simple postman call which would add one to many messages on my topic, this results in triggering the function locally. I've now confirmed my function can be triggered from both the service bus and from local http triggers. In my next post I plan on going through how to setup your code base with azure to automate deployment and testing of the function.
 
 ![Final triggered local function](/Assets/AzureFunctions/Images/FinalRunningFunction.png)
 
-I hope that this article helps someone troubleshoot an issue they're having with setting up their azure function as once you get through the initial setup azure functions become very simple but at the same time very powerful. All the code for the azure fucntion, the shared access signature Generator and the postman collections are accessible in Github.
+I hope that this article helps someone troubleshoot an issue they're having with setting up their azure function as once you get through the initial setup azure functions become very simple but at the same time very powerful. All the code for the azure function, the shared access signature Generator and the postman collections are accessible in Github.
 
 
 ## Useful Links
