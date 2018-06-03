@@ -127,10 +127,10 @@ I hope that this article helps someone troubleshoot an issue they're having with
 
  Url | Description
 ------------ | -------------
-[](https://github.com/Azure/azure-webjobs-sdk/wiki/ServiceBus-Serialization-Scenarios) | service bus parameters and how to create them.
-https://github.com/Azure/azure-webjobs-sdk/issues/979 | issue with POCO requiring special creating rather than just working with JSON data.
-https://docs.microsoft.com/en-us/azure/azure-functions/functions-host-json | host docs
-https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local | core tools for local docs   
-https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local#local-settings-file | local settings docs.
-https://code.msdn.microsoft.com/Using-Shared-Access-e605b37c/sourcecode?fileId=91232&pathId=148562433 | Project showing how to generate SAS
-https://docs.microsoft.com/en-nz/rest/api/servicebus/send-message-batch | Documentation on sending batch message (content-type is wrong as stated in comments.)
+[https://github.com/Azure/azure-webjobs-sdk/wiki/ServiceBus-Serialization-Scenarios](https://github.com/Azure/azure-webjobs-sdk/wiki/ServiceBus-Serialization-Scenarios) | service bus parameters and how to create them.
+[https://github.com/Azure/azure-webjobs-sdk/issues/979](https://github.com/Azure/azure-webjobs-sdk/issues/979) | issue with POCO requiring special creating rather than just working with JSON data.
+[https://docs.microsoft.com/en-us/azure/azure-functions/functions-host-json](https://docs.microsoft.com/en-us/azure/azure-functions/functions-host-json) | host docs
+[https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local) | core tools for local docs   
+[https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local#local-settings-file](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local#local-settings-file) | local settings docs.
+[https://code.msdn.microsoft.com/Using-Shared-Access-e605b37c/sourcecode?fileId=91232&pathId=148562433](https://code.msdn.microsoft.com/Using-Shared-Access-e605b37c/sourcecode?fileId=91232&pathId=148562433) | Project showing how to generate SAS
+[https://docs.microsoft.com/en-nz/rest/api/servicebus/send-message-batch](https://docs.microsoft.com/en-nz/rest/api/servicebus/send-message-batch) | Documentation on sending batch message (content-type is wrong as stated in comments.)
