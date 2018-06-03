@@ -51,7 +51,7 @@ This will create something similar to the following, one change that I made was 
 
 Azure functions use a local file called local.settings.json, this allows you to define AppSettings, connectionStrings and custom host.json configuration when running locally. This file doesn't get uploaded to azure and it doesn't get checked into source control. This ensures that developers aren't going to check in any passwords to source control which is a great move in my opinion. It would be nice to have a settings.schema.json which contained a definition for what the settings should look like but putting this stuff in a readme works for now.
 
-In order to get the code to work I needed to modify the local.settings.json file to provide the "ServiceBusConnectionString" parameter, this parameter has to be added under the Values section and match the `Connection` parameter passed into the `ServiceBusTrigger` attribute. I also added a host property, the host property allows you to define custom host configuration while running locally, in this we've set that we only want to run a single function at a time and that we want to use the ILogger for information and error calls. The host parameters configuration if desired inside the azure environment should be placed inside the host.json file.
+In order to get the code to work I needed to modify the local.settings.json file to provide the "ServiceBusConnectionString" parameter, this parameter has to be added under the Values section and match the `Connection` parameter passed into the `ServiceBusTrigger` attribute. I also added a host property, the host property allows you to define custom host configuration while running locally, in this we've set that we only want to run a single function at a time and that we want to use the `ILogger` for information and error calls. The host parameters configuration if desired inside the azure environment should be placed inside the `host.json` file.
 
 After I got this setup the first step was to get it running on my local machine to trigger the function I used postman. I had hoped to set this up without using an actual azure service bus property but unfortunately it doesn't look like there's an emulator for the service bus currently. The function seems to requires a valid connection string, since the initialization checks for null and empty strings, even passing fake values resulted in further validation errors. I ended up giving in and adding an actual service bus connection string but if there's a way to fake this please let me know.
 
@@ -65,7 +65,7 @@ ContentType | application/json
 
 This should cause the console from the running azure function to output a message. You now have tested that the function is running locally and you're able to trigger the code within it. It is possible to use a custom class as a parameter to your azure function and it will get deserialized before your code is called but that requires the message to be sent to the service bus in a particular format, so for now I'm going to concentrate on getting a `byte[]`. Another reason for not using a custom object is that you might find you don't want to use Json for serializing your data but rather a non human readable format to reduce your message size.
 
-So in order to read a meaningful object from the byte[] we want to deserialize it and add some logic around it, for now I've just added some logging for different conditions.
+So in order to read a meaningful object from the `byte[]` we want to deserialize it and add some logic around it, for now I've just added some logging for different conditions.
 
 ```C#
     public static class ServiceBusReader
@@ -98,10 +98,10 @@ So in order to read a meaningful object from the byte[] we want to deserialize i
 
 I then need to update my postman content to match this new data type as follows, notice how the input is still a string so you'll need to escape the quote characters.
 
-```JSON
+```
     {
-    	"input": "
-    	    {
+    	"input":
+    	    "{
     	    	\"AccountExists\": \"false\",
     	    	\"EmailAddress\": \"test@mailinator.com\"    	    	
     	    }"
@@ -117,6 +117,7 @@ With signature in hand I could create a simple postman call which would add one 
 I hope that this article helps someone troubleshoot an issue they're having with setting up their azure function as once you get through the initial setup azure functions become very simple but at the same time very powerful. All the code for the azure fucntion, the shared access signature Generator and the postman collections are accessible in Github.
 
 
+## Useful Links
 
 * https://github.com/Azure/azure-webjobs-sdk/wiki/ServiceBus-Serialization-Scenarios - service bus parameters and how to create them.
 * https://github.com/Azure/azure-webjobs-sdk/issues/979 - issue with POCO requiring special creating rather than just working with json data.
