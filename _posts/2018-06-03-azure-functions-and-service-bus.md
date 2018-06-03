@@ -127,7 +127,7 @@ I hope that this article helps someone troubleshoot an issue they're having with
 
  Url | Description
 ------------ | -------------
-https://github.com/Azure/azure-webjobs-sdk/wiki/ServiceBus-Serialization-Scenarios | service bus parameters and how to create them.
+[](https://github.com/Azure/azure-webjobs-sdk/wiki/ServiceBus-Serialization-Scenarios) | service bus parameters and how to create them.
 https://github.com/Azure/azure-webjobs-sdk/issues/979 | issue with POCO requiring special creating rather than just working with JSON data.
 https://docs.microsoft.com/en-us/azure/azure-functions/functions-host-json | host docs
 https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local | core tools for local docs   
