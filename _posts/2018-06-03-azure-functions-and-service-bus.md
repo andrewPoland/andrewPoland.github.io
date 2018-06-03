@@ -54,11 +54,11 @@ In order to get the code to work I needed to modify the local.settings.json file
     }
 ```
 
-After I got this setup the first step was to get it running on my local machine to trigger the function I used postman. I had hoped to set this up without using an actual azure service bus property but unfortunately it doesn't look like there's an emulator for the service bus currently. The function seems to requires a valid connection string, since the initialization checks for null and empty strings, even passing fake values resulted in further validation errors. I ended up giving in and adding an actual service bus connection string but if there's a way to fake this please let me know.
+After I got this setup, the first step was to get it running on my local machine. I had hoped to set this up without using an actual azure service bus but unfortunately it doesn't look like there's an emulator for the service bus currently. The function requires a valid connection string as well, since the initialization checks for null and empty strings. Even passing fake values resulted in further validation errors. I ended up giving in and adding an actual service bus connection string but if there's a way to fake this please let me know.
 
 ![Initial running local function](/Assets/AzureFunctions/Images/InitialRunningFunction.png)
 
-Success! I now have a function running on my local machine on port 7071, now all I need to do is trigger it. In the above function we are using the parameter `string mySbMsg` so we are only providing a string. Azure functions has a special url for testing functions via http calls. We just need to do a post call as follows
+Success! I now have a function running on my local machine on port 7071, now all I need to do is trigger it. In the above function we are using the parameter `string mySbMsg` so we are only providing a string. Azure functions has a special url for testing functions via http calls. We just need to do a post web call in postman as follows
 
 Url | http://localhost{port}/admin/functions/{functionName}
 Body | ``` { "input": "test plain text message" } ```
@@ -68,7 +68,7 @@ ContentType | application/json
 
 This should cause the console from the running azure function to output a message. You now have tested that the function is running locally and you're able to trigger the code within it. It is possible to use a custom class as a parameter to your azure function and it will get deserialized before your code is called but that requires the message to be sent to the service bus in a particular format, so for now I'm going to concentrate on getting a `byte[]`. Another reason for not using a custom object is that you might find you don't want to use Json for serializing your data but rather a non human readable format to reduce your message size.
 
-So in order to read a meaningful object from the `byte[]` we want to deserialize it and add some logic around it, for now I've just added some logging for different conditions.
+In order to read a meaningful object from the `byte[]` we want to deserialize it and add some logic around it, for now I've just added some logging for different conditions.
 
 ```C#
     public static class ServiceBusReader
@@ -77,6 +77,7 @@ So in order to read a meaningful object from the `byte[]` we want to deserialize
         public static void Run([ServiceBusTrigger("NewSubscriptions", "SendSignupEmail", Connection = "ServiceBusRootConnectionString")] byte[] structuredMessage, ILogger log)
         {
             SignupInformation newAccount = DeserializeJsonMessage<SignupInformation>(structuredMessage);
+
             if (newAccount.AccountExists)
             {
                 log.LogInformation("fix the filter on your subscription to prevent this.");
@@ -111,7 +112,7 @@ I then need to update my postman content to match this new data type as follows,
     }    
 ```
 
-that's all I want to have functionally for this function so now that we've tested it's triggering from our http test it's time to trigger off the actual service bus.
+that's all the functionally required to confirm it can be triggered from the admin url, now it's time to trigger off an actual service bus.
 
 In order to send messages to my Azure service bus topic I want to use postman so I can trigger my local function through the admin portal or service bus from a single location. unfortunately it's not the simplest process, in order to authenticate with the service bus REST API you need a Shared Access Signature (SAS). The azure portal has a feature to create one of these for an Azure storage account but I couldn't find anything to do this for the service bus. Shared Access Signatures aren't simple and are deserving of their own post but I ended up making a console application based off [this project](https://code.msdn.microsoft.com/Using-Shared-Access-e605b37c/sourcecode?fileId=91232&pathId=148562433) that generates signatures.
 
