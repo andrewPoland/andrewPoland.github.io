@@ -112,7 +112,9 @@ I then need to update my postman content to match this new data type as follows,
 
 that's all I want to have functionally for this function so now that we've tested it's triggering from our http test it's time to trigger off the actual service bus.
 
-In order to send messages to my Azure service bus topic I want to use postman so I can trigger my local function through the admin portal or service bus from a single location. unfortunately it's not the simplest process, in order to authenticate with the service bus REST api you need a Shared Access Signature. The azure portal has a feature to create one of these for an Azure storage account but I couldn't find anything to do this for the service bus. Shared Access Signatures aren't simple and are deserving of their own post but I ended up making a console application based off <insert link> that generates a the signature.
+In order to send messages to my Azure service bus topic I want to use postman so I can trigger my local function through the admin portal or service bus from a single location. unfortunately it's not the simplest process, in order to authenticate with the service bus REST api you need a Shared Access Signature (SAS). The azure portal has a feature to create one of these for an Azure storage account but I couldn't find anything to do this for the service bus. Shared Access Signatures aren't simple and are deserving of their own post but I ended up making a console application based off [this project](https://code.msdn.microsoft.com/Using-Shared-Access-e605b37c/sourcecode?fileId=91232&pathId=148562433) that generates signatures.
+
+![Final triggered local function](/Assets/AzureFunctions/Images/ServiceBusFormatPostman.png)
 
 With signature in hand I could create a simple postman call which would add one to many messages on my topic, this results in triggering the function locally. I've now confirmed my function can be triggered from both the service bus and from local http triggers. In my next post I plan on going through how to automate the setup of code base with azure to automate the depoyment and testing of the function in azure.
 
@@ -122,11 +124,12 @@ I hope that this article helps someone troubleshoot an issue they're having with
 
 
 ## Useful Links
-
-* https://github.com/Azure/azure-webjobs-sdk/wiki/ServiceBus-Serialization-Scenarios - service bus parameters and how to create them.
-* https://github.com/Azure/azure-webjobs-sdk/issues/979 - issue with POCO requiring special creating rather than just working with json data.
-* https://docs.microsoft.com/en-us/azure/azure-functions/functions-host-json - host docs
-* https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local - core tools for local docs  
-* https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local#local-settings-file - local settings docs.
-* https://code.msdn.microsoft.com/Using-Shared-Access-e605b37c/sourcecode?fileId=91232&pathId=148562433
-* https://docs.microsoft.com/en-nz/rest/api/servicebus/send-message-batch
+| Url | Description |
+|-----|----|
+| https://github.com/Azure/azure-webjobs-sdk/wiki/ServiceBus-Serialization-Scenarios | service bus parameters and how to create them. |
+| https://github.com/Azure/azure-webjobs-sdk/issues/979 | issue with POCO requiring special creating rather than just working with JSON data. |
+| https://docs.microsoft.com/en-us/azure/azure-functions/functions-host-json | host docs |
+| https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local | core tools for local docs   |
+| https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local#local-settings-file | local settings docs. |
+| https://code.msdn.microsoft.com/Using-Shared-Access-e605b37c/sourcecode?fileId=91232&pathId=148562433 | Project showing how to generate SAS |
+| https://docs.microsoft.com/en-nz/rest/api/servicebus/send-message-batch | Documentation on sending batch message (content-type is wrong as stated in comments.) |
