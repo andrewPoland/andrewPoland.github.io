@@ -7,7 +7,7 @@ So first things first make sure you have a copy of visual studio 2017 installed,
 
 Once that was installed when I search "azure function" in the new project wizard it shows up and I'm then able to create an azure function project. At the time of writing this the wizard does not provide a service bus topic option so you'll have to create an empty project and then you can right click -> add new function and select service bus topic from the list.
 
-![Azure function missing in wizard](/Assets/AzureFunctions/Images/ServiceBusFunctionWizard.png)
+![Service bus trigger in wizard](/Assets/AzureFunctions/Images/ServiceBusFunctionWizard.png)
 
 This will create something similar to the following, one change that I made was to use the `Microsoft.Extensions.ILogger` instead of the `TraceWriter`. The Microsoft team appear to be working on a way to utilize dependency injection but that might be a while off but it doesn't stop us from setting up our code to handle it when it is supported.
 
@@ -55,13 +55,15 @@ In order to get the code to work I needed to modify the local.settings.json file
 
 After I got this setup the first step was to get it running on my local machine to trigger the function I used postman. I had hoped to set this up without using an actual azure service bus property but unfortunately it doesn't look like there's an emulator for the service bus currently. The function seems to requires a valid connection string, since the initialization checks for null and empty strings, even passing fake values resulted in further validation errors. I ended up giving in and adding an actual service bus connection string but if there's a way to fake this please let me know.
 
-Success, I now have a function running on my local machine on port 7071, now all I need to do is trigger it. In the above function we are using the parameter `string mySbMsg` so we are only providing a string. Azure functions has a special url for testing functions via http calls. We just need to do a post call as follows
+![Initial running local function](/Assets/AzureFunctions/Images/InitialRunningFunction.png)
+
+Success! I now have a function running on my local machine on port 7071, now all I need to do is trigger it. In the above function we are using the parameter `string mySbMsg` so we are only providing a string. Azure functions has a special url for testing functions via http calls. We just need to do a post call as follows
 
 Url | http://localhost{port}/admin/functions/{functionName}
 Body | ``` { "input": "test plain text message" } ```
 ContentType | application/json        
 
-![Azure function missing in wizard](/Assets/AzureFunctions/Images/PlainTextPostman.png)
+![Sending plain text message in postman](/Assets/AzureFunctions/Images/PlainTextPostman.png)
 
 This should cause the console from the running azure function to output a message. You now have tested that the function is running locally and you're able to trigger the code within it. It is possible to use a custom class as a parameter to your azure function and it will get deserialized before your code is called but that requires the message to be sent to the service bus in a particular format, so for now I'm going to concentrate on getting a `byte[]`. Another reason for not using a custom object is that you might find you don't want to use Json for serializing your data but rather a non human readable format to reduce your message size.
 
@@ -113,6 +115,8 @@ that's all I want to have functionally for this function so now that we've teste
 In order to send messages to my Azure service bus topic I want to use postman so I can trigger my local function through the admin portal or service bus from a single location. unfortunately it's not the simplest process, in order to authenticate with the service bus REST api you need a Shared Access Signature. The azure portal has a feature to create one of these for an Azure storage account but I couldn't find anything to do this for the service bus. Shared Access Signatures aren't simple and are deserving of their own post but I ended up making a console application based off <insert link> that generates a the signature.
 
 With signature in hand I could create a simple postman call which would add one to many messages on my topic, this results in triggering the function locally. I've now confirmed my function can be triggered from both the service bus and from local http triggers. In my next post I plan on going through how to automate the setup of code base with azure to automate the depoyment and testing of the function in azure.
+
+![Final triggered local function](/Assets/AzureFunctions/Images/FinalRunningFunction.png)
 
 I hope that this article helps someone troubleshoot an issue they're having with setting up their azure function as once you get through the initial setup azure functions become very simple but at the same time very powerful. All the code for the azure fucntion, the shared access signature Generator and the postman collections are accessible in Github.
 
