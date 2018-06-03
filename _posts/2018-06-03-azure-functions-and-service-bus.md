@@ -3,11 +3,11 @@ it's so easy to get stuck because you missed a single step but if you're just af
 
 So first things first make sure you have a copy of visual studio 2017 installed, pervious versions do not support the project template for azure functions. For the purpose of this article I was using a community edition but any edition should work the same. When I first tried to create an azure function project in visual studio I found I hadn't installed the azure tools so the template didn't exist inside the new project wizard. No worries there's a link on the new project wizard which opens the visual studio installer, from here I just needed to select the azure development workflow.
 
-[!Azure function missing in wizard](/Assets/AzureFunctions/Images/FunctionSearch.png)
+![Azure function missing in wizard](/Assets/AzureFunctions/Images/FunctionSearch.png)
 
 Once that was installed when I search "azure function" in the new project wizard it shows up and I'm then able to create an azure function project. At the time of writing this the wizard does not provide a service bus topic option so you'll have to create an empty project and then you can right click -> add new function and select service bus topic from the list.
 
-[!Azure function missing in wizard](/Assets/AzureFunctions/Images/ServiceBusFunctionWizard.png)
+![Azure function missing in wizard](/Assets/AzureFunctions/Images/ServiceBusFunctionWizard.png)
 
 This will create something similar to the following, one change that I made was to use the `Microsoft.Extensions.ILogger` instead of the `TraceWriter`. The Microsoft team appear to be working on a way to utilize dependency injection but that might be a while off but it doesn't stop us from setting up our code to handle it when it is supported.
 
@@ -61,7 +61,7 @@ Url | http://localhost{port}/admin/functions/{functionName}
 Body | ``` { "input": "test plain text message" } ```
 ContentType | application/json        
 
-[!Azure function missing in wizard](/Assets/AzureFunctions/Images/PlainTextPostman.png)
+![Azure function missing in wizard](/Assets/AzureFunctions/Images/PlainTextPostman.png)
 
 This should cause the console from the running azure function to output a message. You now have tested that the function is running locally and you're able to trigger the code within it. It is possible to use a custom class as a parameter to your azure function and it will get deserialized before your code is called but that requires the message to be sent to the service bus in a particular format, so for now I'm going to concentrate on getting a `byte[]`. Another reason for not using a custom object is that you might find you don't want to use Json for serializing your data but rather a non human readable format to reduce your message size.
 
