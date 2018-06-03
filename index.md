@@ -68,13 +68,11 @@ null and empty strings, even passing fake values resulted in further validation 
 Success, I now have a function running on my local machine on port 7071, now all I need to do is trigger it. In the above function we are using the parameter `string mySbMsg` so we are only providing a string. Azure functions
 has a special url for testing functions via http calls. We just need to do a post call as follows
 
-Url|http://localhost{port}/admin/functions/{functionName}
-Body|     ```JSON
-          {
-              "input": "test plain text message"  
-          }
-          ```
-ContentType|application/json        
+First Header | Second Header
+------------ | -------------
+Url | http://localhost{port}/admin/functions/{functionName}
+Body | ` { "input": "test plain text message" }`
+ContentType | application/json        
 
 This should cause the console from the running azure function to output a message. You now have tested that the function is running locally and you're able to trigger the code within it. It is possible to use a custom class as a
 parameter to your azure function and it will get deserialized before your code is called but that requires the message to be sent to the service bus in a particular format, so for now I'm going to concentrate on getting a `byte[]`.
@@ -115,8 +113,8 @@ I then need to update my postman content to match this new data type as follows,
 
 ```JSON
     {
-    	"input": "
-    	    {
+    	"input": 
+    	    "{
     	    	\"AccountExists\": \"false\",
     	    	\"EmailAddress\": \"test@mailinator.com\"    	    	
     	    }"
