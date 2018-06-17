@@ -1,4 +1,4 @@
-#Stop doing manual shit
+# Stop doing manual shit
 
 I do way too much manual work. I am guilty of right click publishing projects. I am guilty of manually running tests.
 
