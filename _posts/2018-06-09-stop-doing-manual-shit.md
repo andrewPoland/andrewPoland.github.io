@@ -54,7 +54,7 @@ Once I had made these modifications, my build and release were finally working a
 
 ![Azure Function configuration](/Assets/DevopsProject/Images/AzureFunctionConfiguration.png)
 
-###Was all that worth it?
+### Was all that worth it?
 
 ![Final DevOps Project portal view](/Assets/DevopsProject/Images/FunctionDevopsProject.png)
 
