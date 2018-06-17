@@ -50,7 +50,7 @@ I now had a build completing and it was time to setup the release. The release w
 
 ![Completed deploy task configuration](/Assets/DevopsProject/Images/CompletedDeployConfig.png)
 
-Once I had made these modifications, my build and release were finally working and I was able to view this in the DevOps Project portal. I then went to test my new Azure Function using my App Insights instance but once again I hit a snag. Nothing was showing up and my function wasn't triggering. It took me longer than I care to admit, to find that the reason was I hadn't configured my function. I went to the portal and added the instrumentation key, service bus connection string and *most importantly the Functions_Extension_Version* settings. Why is that one the most important? well if you are running a .net core Azure Function without that setting set to "beta", your function will not run.  
+Once I had made these modifications, my build and release were finally working and I was able to view this in the DevOps Project portal. I then went to test my new Azure Function using my App Insights instance but once again I hit a snag. Nothing was showing up and my function wasn't triggering. It took me longer than I care to admit, to find that the reason was I hadn't configured my function. I went to the portal and added the instrumentation key, service bus connection string and **most importantly the Functions_Extension_Version** settings. Why is that one the most important? well if you are running a .net core Azure Function without that setting set to "beta", your function will not run.  
 
 ![Azure Function configuration](/Assets/DevopsProject/Images/AzureFunctionConfiguration.png)
 
