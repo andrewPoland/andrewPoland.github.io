@@ -18,11 +18,11 @@ A few weeks ago I watched a dev-ops video from Build and it got me genuinely exc
 
 ### How do I set it up?
 
-This is one of the rare azure tools you actually want to setup from the portal, so from the portal if you search for DevOps it should show up like below.
+This is one of the rare azure tools you actually want to setup from the portal, so from the portal if you search for DevOps, it should show up like below.
 
 ![Azure DevOps Project in wizard](/Assets/DevopsProject/Images/DevopsProjectInPortal.png)
 
-Once you've clicked through to creating a DevOps Project, it presents you with the following wizard. There are multiple streams you can take here, the wizard supports creating new projects, where you choose the language and azure resources that you want to create. In my case I'm using the azure function code I wrote about earlier, so I went with the "Use existing option". I could then select GitHub as a source control location and direct it to use that when setting up my build and release templates.
+Once you've clicked through to creating a DevOps Project, it presents you with a wizard. There are multiple streams you can take here, the wizard supports creating new projects, where you choose the language and azure resources that you want to create. In my case I'm using the azure function code I wrote about earlier, so I went with the "Use existing option". I could then select GitHub as a source control location and direct it to use that when setting up my build and release templates.
 
 ![DevOps Project wizard source control step](/Assets/DevopsProject/Images/WizardOwnCodeStepOne.png)
 
@@ -52,7 +52,7 @@ I now had a build completing and it was time to setup the release. The release w
 
 Once I had made these modifications, my build and release were finally working and I was able to view this in the DevOps Project portal. I then went to test my new Azure Function using my App Insights instance but once again I hit a snag. Nothing was showing up and my function wasn't triggering. It took me longer than I care to admit, to find that the reason was I hadn't configured my function. I went to the portal and added the instrumentation key, service bus connection string and *most importantly the Functions_Extension_Version* settings. Why is that one the most important? well if you are running a .net core Azure Function without that setting set to "beta", your function will not run.  
 
-![Azure Function configuration](/Assets/DevopsProject/Images/CompletedDeployConfig.png)
+![Azure Function configuration](/Assets/DevopsProject/Images/AzureFunctionConfiguration.png)
 
 ###Was all that worth it?
 
