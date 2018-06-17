@@ -23,15 +23,13 @@ This is one of the rare azure tools you actually want to setup from the portal, 
 
 ![Azure DevOps Project in wizard](/Assets/DevopsProject/Images/DevopsProjectInPortal.png)
 
-Once you've clicked through to creating a DevOps Project, it presents you with the following wizard. There are multiple streams you can take here, the wizard supports creating new projects, where you choose the language and azure resources that you want to create. In my case I'm using the azure function code I wrote about earlier, so I went with the "Use existing option".
+Once you've clicked through to creating a DevOps Project, it presents you with the following wizard. There are multiple streams you can take here, the wizard supports creating new projects, where you choose the language and azure resources that you want to create. In my case I'm using the azure function code I wrote about earlier, so I went with the "Use existing option". I could then select GitHub as a source control location and direct it to use that when setting up my build and release templates.
 
-![DevOps Porject wizard step one](/Assets/DevopsProject/Images/WizardOwnCodeStepOne.png)
-
-I could then select GitHub as a source control location and direct it to use that when setting up my build and release templates.
-
-![Devops Project Wizard VSTS setup](/Assets/DevopsProject/Images/.png)
+![DevOps Project wizard source control step](/Assets/DevopsProject/Images/WizardOwnCodeStepOne.png)
 
 I then got to choose what service I wanted to use, currently they don't have an Azure Function option, Web Apps are pretty close to Azure Functions so I thought I'd roll the dice and see what happens.
+
+![Devops Project Wizard Azure service step](/Assets/DevopsProject/Images/WizardOwnCodeStepThree.png)
 
 The next step included setting up a Visual Studio Team Services (VSTS) project. I created a new instance of VSTS along with a new resource group which means all new resources. I haven't been able to find out if there is a way to import existing resources into a new DevOps Project.
 
