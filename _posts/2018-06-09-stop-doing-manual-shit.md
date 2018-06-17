@@ -1,5 +1,3 @@
-# Stop doing manual shit
-
 I do way too much manual work. I am guilty of right click publishing projects. I am guilty of manually running tests.
 
 >The definition of insanity is doing the same thing over and over and expecting different results
@@ -8,7 +6,7 @@ I often feel like I'm crazy when I make a code change and I manually run a test 
 
 A few weeks ago I watched a dev-ops video from Build and it got me genuinely excited. Azure offers what they call DevOps Projects. These projects attempt to automate the setup of everything you might need to make that initial leap into the world of automation. They're not perfect, it's in preview and it doesn't set everything up, but it points you in the right direction. This is valuable if you've never set anything like this up before.
 
-## What does it give you?
+### What does it give you?
 
 1. Visual Studio Team Services (VSTS) project for tracking work.
 2. Build template inside VSTS project which pulls from source code.
@@ -17,7 +15,7 @@ A few weeks ago I watched a dev-ops video from Build and it got me genuinely exc
 5. Application Insights instance for monitoring azure resources.
 6. Optional: Git repository in VSTS.
 
-## How do I set it up?
+### How do I set it up?
 
 This is one of the rare azure tools you actually want to setup from the portal, so from the portal if you search for DevOps it should show up like below.
 
@@ -55,7 +53,7 @@ Once I had made these modifications, my build and release were finally working a
 
 ![Azure Function configuration](/Assets/DevopsProject/Images/CompletedDeployConfig.png)
 
-##Was all that worth it?
+###Was all that worth it?
 
 ![Final DevOps Project portal view](/Assets/DevopsProject/Images/FunctionDevopsProject.png)
 
