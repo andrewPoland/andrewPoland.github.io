@@ -1,8 +1,16 @@
+---
+layout: post
+image:
+  path: /Assets/DevopsProject/Images/FunctionDevopsProject.png
+  thumbnail: /Assets/DevopsProject/Images/thumbnail.png
+comments: false
+share: true
+entries_layout: grid
+---
 I do way too much manual work. I am guilty of right click publishing projects. I am guilty of manually running tests.
 
-```
-  The definition of insanity is doing the same thing over and over and expecting different results - Some guy without a dictionary.
-```
+>The definition of insanity is doing the same thing over and over and expecting different results.
+
 
 I often feel like I'm crazy when I make a code change and I manually run a test with the same inputs, expecting the same outputs and getting the same results 90% of the time. So why waste my time when I can get a robot to do it for me?
 

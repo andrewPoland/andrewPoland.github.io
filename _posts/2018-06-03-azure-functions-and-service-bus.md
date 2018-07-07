@@ -1,3 +1,10 @@
+---
+layout: post
+image:
+  thumbnail: /Assets/AzureFunctions/Images/ServiceBusFunctionThumbnail320.png
+comments: false
+share: true
+---
 This post will give you a run down of how to setup an azure function in C# using .net core, visual studio 2017 and azure. I'm a pretty verbose sort of person since
 it's so easy to get stuck because you missed a single step but if you're just after the code and project config feel free to scroll past all the setup steps.
 
