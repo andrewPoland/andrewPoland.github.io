@@ -1,4 +1,4 @@
-remote_theme: chrisbobbe/jekyll-theme-prologue
+remote_theme: old-jekyll-templates/DopeTrope-Jekyll-Theme 
 url: https://andrewpoland.github.io
 base_url: https://andrewpoland.github.io
 collections: [sections]
