@@ -12,7 +12,7 @@ I do way too much manual work. I am guilty of right click publishing projects. I
 >The definition of insanity is doing the same thing over and over and expecting different results.
 
 
-I often feel like I'm crazy when I make a code change and I manually run a test with the same inputs, expecting the same outputs and getting the same results 90% of the time. So why waste my time when I can get a robot to do it for me?
+I often feel like I'm crazy when I make a code change and I manually run a test with the same inputs, expecting the same outputs and getting the same results 90% of the time. So why waste my time when I can get a bot to do it for me?
 
 A few weeks ago I watched a dev-ops video from Build and it got me genuinely excited. Azure offers what they call DevOps Projects. These projects attempt to automate the setup of everything you might need to make that initial leap into the world of automation. They're not perfect, it's in preview and it doesn't set everything up, but it points you in the right direction. This is valuable if you've never set anything like this up before.
 
