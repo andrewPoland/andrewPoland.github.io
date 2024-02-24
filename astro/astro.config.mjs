@@ -8,7 +8,7 @@ import markdoc from "@astrojs/markdoc";
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://andrew-poland.github.io/',
+  site: 'https://andrewpoland.github.io/',
   // Write here your website url
   markdown: {
     remarkPlugins: [remarkReadingTime],
