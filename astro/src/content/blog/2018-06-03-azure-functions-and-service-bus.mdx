@@ -11,12 +11,13 @@ tags:
     - Retired
 ---
 
-{% aside title="Retired" type="note" %}
+import Aside from '../../components/Aside.astro'
+
+<Aside title="Retired" type="caution">
 
 This article was written in 2018, so the information may no longer be relevant today.
 
-{% /aside %}
-
+</Aside>
 
 This post will give you a run down of how to setup an azure function in C# using .net core, visual studio 2017 and azure. I'm a pretty verbose sort of person since
 it's so easy to get stuck because you missed a single step but if you're just after the code and project config feel free to scroll past all the setup steps.
@@ -82,9 +83,11 @@ After I got this setup, the first step was to get it running on my local machine
 
 Success! I now have a function running on my local machine on port 7071, now all I need to do is trigger it. In the above function we are using the parameter `string mySbMsg` so we are only providing a string. Azure functions has a special url for testing functions via http calls. We just need to do a post web call in postman as follows
 
-Url | http://localhost{port}/admin/functions/{functionName}
-Body | ``` { "input": "test plain text message" } ```
-ContentType | application/json        
+|        |                                                        | 
+| ---    | -------------------------------------------------------|
+| Url    | http://localhost{port}/admin/functions/{functionName}  |
+| Body   | ` { "input": "test plain text message" } `             |
+| ContentType | application/json                                  |
 
 ![Sending plain text message in postman](../../assets/images/azure-functions/plain-text-postman.png)
 

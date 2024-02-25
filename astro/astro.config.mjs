@@ -4,8 +4,6 @@ import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 import { remarkReadingTime } from './src/utils/readTime.ts';
 
-import markdoc from "@astrojs/markdoc";
-
 // https://astro.build/config
 export default defineConfig({
   site: 'https://andrewpoland.github.io/',
@@ -24,5 +22,5 @@ export default defineConfig({
       wrap: true
     },
     drafts: true
-  }), sitemap(), tailwind(), markdoc({ ignoreIndentation: true})]
+  }), sitemap(), tailwind()]
 });
