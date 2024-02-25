@@ -1,6 +1,7 @@
 # Blog
 
 
+
 ## deployment
 Workflow deploys astro site to github pagees.
 
@@ -9,7 +10,7 @@ Workflow deploys astro site to github pagees.
 Using pnpm for managing packages and running locally. 
 
 ```ps1
-pnpm dev
+pnpm run dev
 ```
 
 ## posts
