@@ -16,13 +16,14 @@
 		"format": "prettier --plugin-search-dir=. --write .",
 		"lint": "eslint .",
 		"pre-commit": "lint-staged",
-		"prepare": "cd .. && husky install astro/.husky"
+		"prepare": "husky install .husky"
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.5.5",
 		"@astrojs/rss": "4.0.1",
 		"astro": "4.0.8",
 		"astro-font": "^0.0.72",
+		"sharp": "^0.33.2",
 		"typescript": "^5.3.3"
 	},
 	"devDependencies": {

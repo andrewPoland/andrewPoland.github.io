@@ -22,6 +22,8 @@ This article was written in 2018, so the information may no longer be relevant t
 This post will give you a run down of how to setup an azure function in C# using .net core, visual studio 2017 and azure. I'm a pretty verbose sort of person since
 it's so easy to get stuck because you missed a single step but if you're just after the code and project config feel free to scroll past all the setup steps.
 
+## Setting up
+
 So first things first make sure you have a copy of visual studio 2017 installed, pervious versions do not support the project template for azure functions. For the purpose of this article I was using a community edition but any edition should work the same. When I first tried to create an azure function project in visual studio I found I hadn't installed the azure tools so the template didn't exist inside the new project wizard. No worries there's a link on the new project wizard which opens the visual studio installer, from here I just needed to select the azure development workflow.
 
 ![Azure function missing in wizard](../../assets/images/azure-functions/function-search.png)
@@ -76,6 +78,8 @@ In order to get the code to work I needed to modify the local.settings.json file
     }
 }
 ```
+
+## Testing locally
 
 After I got this setup, the first step was to get it running on my local machine. I had hoped to set this up without using an actual azure service bus but unfortunately it doesn't look like there's an emulator for the service bus currently. The function requires a valid connection string as well, since the initialization checks for null and empty strings. Even passing fake values resulted in further validation errors. I ended up giving in and adding an actual service bus connection string but if there's a way to fake this please let me know.
 
