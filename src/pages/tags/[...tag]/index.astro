@@ -15,10 +15,10 @@ export async function getStaticPaths() {
 
 const { tag } = Astro.props
 
-const posts = await getPostByTag(tag)
+const posts = (await getPostByTag(tag as string))
 ---
 
 <BaseLayout title={tag}>
-	<TitlePage title={tag} />
+	<TitlePage title={tag as string} />
 	<ListPosts posts={posts} />
 </BaseLayout>
