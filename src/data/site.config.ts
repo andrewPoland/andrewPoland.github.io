@@ -10,7 +10,7 @@ interface SiteConfig {
 
 export const siteConfig: SiteConfig = {
 	author: 'Andrew Poland', // Site author
-	title: 'Personal Blog', // Site title.
+	title: 'Andrew Poland', // Site title.
 	description: 'Personal blog to provide guidance within the technology space. All opionions are my own and do not reflect those of any current, past or future employers.', // Description to display in the meta tags
 	lang: 'en-GB',
 	ogLocale: 'en_GB',
