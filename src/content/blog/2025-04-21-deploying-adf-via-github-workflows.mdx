@@ -1,0 +1,103 @@
+---
+title: 'Deploying ADF via Github Workflows'
+description: >-
+  A brief look at things to consider when deploying ADF. The official github workflow was archived so more people are likely to run their own workflows.  
+pubDate: 'Apr 22 2025'
+heroImage: ../../assets/images/azure-datafactory/adf-image.png
+category: Azure
+tags: 
+    - Azure
+    - Automation
+    - Dev Ops
+    - ADF
+    - Github
+---
+import Aside from '../../components/Aside.astro'
+
+
+In this post, we'll explore things to be aware of when automating the deployment of Azure Data Factory (ADF) using GitHub workflows. We'll cover the prerequisites, steps which are commonly forgotten, and some key considerations to keep in mind.
+
+<Aside title="ADF" type="note">
+
+When talking about ADF, the details of this post does not take into consideration Fabric and any differences that Fa might introduce.
+
+</Aside>
+<br/>
+
+# 🧠 Things to know 
+
+The following factors should play a key consideration to how you approach building an automation workflow for ADF.
+
+## Arm Template Deployments
+
+At the time of writing, ADF only supports deployment via ARM templates. This is true when deploying using external actions, the Azure CLI, or PowerShell modules. This restriction means the following points are important to consider when deploying an ADF instance:
+1. The identity performing the ADF deployment will require a high level of permissions, so it should be appropriately scoped.
+1. The published version of ADF and the branch-based view in ADF are not independent of each other for some features.
+
+<Aside title="Full Deployment" type="caution">
+
+When performing a "Full" ARM template deployment, be very careful that the resource group does not contain any resources other than the ADF instance. A full deployment will remove all existing resources and replace them with what's defined in the ARM template, which could lead to data loss.
+
+</Aside>
+<br/>
+
+## Deprecated actions
+
+The Azure team previously published a Data Factory deployment action via GitHub, but this was archived in 2024[^1]. I wasn't able to find an official reason for the deprecation, and while the action can still be used, it's recommended not to depend on it going forward.
+
+With that action now deprecated, the primary options available are the az CLI or ARM template deployment action. Both perform the same underlying operations, so the choice largely comes down to personal preference and readability. Personally, I prefer using the Azure CLI, as it also allows running deployments locally — which is helpful for troubleshooting.
+
+The key takeaway after this change is that pre- and post-deployment steps are no longer handled automatically. This means you're now responsible for managing the following tasks
+
+* Stopping triggers before the deployment
+* Deleting old pipelines
+* Deleting old dataflows
+* Deleting old datasets
+* Deleting old linked services
+* Deleting old integration runtimes
+* Deleting old private endpoints
+* Starting triggers after the deployment
+
+If deploying via a full deployment the resources will be fully removed which will mitigate the need to clean up but might require some extra considerations since everything will be re-created. 
+
+
+[^1]: https://github.com/Azure/data-factory-deploy-action
+
+## Private Endpoints
+
+Private endpoints allow ADF to securely access private or on premise resources[^2]. The private endpoints in ADF lives outside your tenant, this means you will get a private endpoint request on your resources which require manual approval before ADF can access their data plane when using an integration runtime on an Azure managed network. 
+
+These private endpoints have the following restrictions
+
+1. You cannot deploy two private endpoints that point to the same resource[^3].
+1. You cannot update an private endpoint to point to a new location. It must be deleted and then recreated[^4].
+
+[^2]: https://learn.microsoft.com/en-us/azure/data-factory/data-factory-private-link
+[^3]: https://community.snowflake.com/s/article/Unable-to-create-a-Managed-Private-Endpoint-from-Azure-Data-Factory-or-Synapse
+[^4]: https://learn.microsoft.com/en-us/azure/data-factory/continuous-integration-delivery#:~:text=Managed%20private%20endpoint%20deployment
+
+## Triggers
+
+Triggers are used within ADF to trigger pipelines, typically on a time based schedule. The triggers can be in an enabled or disabled state which will be defined within the files in your repository. During deployment it will create these triggers in the state defined within the file but parameters do not influence this state. 
+
+In order to ensure that triggers are enabled/disabled based on environments you'll need to add a step/job which can handle enabling the triggers based on the deployment environment after deploying the ADF template.
+
+
+# 🛠️ Steps of the workflow
+
+Now that we've looked at the common pitfalls with ADF deployment, let's break down the steps and the order they should happen in
+
+1. Log in using an identity with the necessary permissions to deploy ADF (either Contributor or a custom role), preferably using federated credentials tied to your workflow or environment.
+1. Stop all ADF triggers.
+1. Ensure no pipelines are running in ADF.
+1. Deploy ADF. 
+1. Delete any resources which no longer exist within the branch you're deploying. 
+1. Start the triggers that are defined as enabled within the deployed environment. 
+
+I plan to publish a template which covers the above in the future but for now these steps should be sufficient to write your own workflow.
+
+# 💡 Conclusion
+
+As organizations embrace DevOps practices and modern data architectures, Azure Data Factory is increasingly becoming the go-to solution for automating, orchestrating, and deploying scalable data pipelines as part of robust CI/CD workflows.
+
+For this reason, having well-defined automation workflows around ADF is critical—enabling safe, repeatable, and high-quality deployments as part of a resilient and scalable CI/CD pipeline.
