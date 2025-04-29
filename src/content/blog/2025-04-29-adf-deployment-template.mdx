@@ -1,0 +1,287 @@
+---
+title: 'ADF deployment template'
+description: >-
+  A follow on article which goes over a yaml template for deploying ADF via github  
+pubDate: 'Apr 29 2025'
+heroImage: ../../assets/images/azure-datafactory/adf-image.png
+category: Azure
+tags: 
+    - Azure
+    - Automation
+    - Dev Ops
+    - ADF
+    - Github
+---
+import Aside from '../../components/Aside.astro'
+
+This post is a follow on from a [previous post](../2025-04-21-deploying-adf-via-github-workflows) where I covered the complications that can arise when deploying ADF to Azure. This post will cover the template you can use to deploy ADF which handles all those scenarios. It won't go into detail around the setup of components, instead it just provides context to the yaml.
+
+<Aside title="ADF" type="note">
+
+When talking about ADF, the details of this post does not take into consideration Fabric and any differences that Fabric might introduce.
+
+</Aside>
+<br/>
+
+# ✏️ prerequisites
+
+The following should all be setup in order to support the template. 
+
+1. Azure Managed Identity.
+1. Federated Credentials for the identity against the github Environment & Repo.
+1. An azure data factory instance.
+1. RBAC assignment of Data Factory Contributor for the identity.
+
+## 🛠️ Arm Template
+
+The arm template can be found directly in [the repo](https://github.com/andrewPoland/adf-deployment) as well. We'll go through how each step is working in more detail below.
+
+```yaml
+name: Deploy ADF
+
+run-name: Deploy ADF to ${{ inputs.deploy_target || 'sbx' }}
+
+on: 
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: environment name
+        type: environment
+
+env: 
+  trigger_config: ./.deployment/config/${{inputs.deploy_target || 'sbx' }}/triggers.json
+  deployment_params: .deployment/config/${{inputs.deploy_target || 'sbx' }}/parameters.json
+
+jobs:
+  deploy-adf:
+    name: Deploy ADF to ${{inputs.deploy_target || 'sbx' }}
+    runs-on: ubuntu-latest
+    environment: ${{inputs.deploy_target || 'sbx' }}
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:      
+      - uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with: 
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+      
+      - name: Install Node Modules
+        run: |
+          npm ci
+          
+      - name: Install Powershell Modules
+        shell: pwsh
+        run: |
+          Install-Module -Name Az.DataFactory -f      
+
+      - name: Export ARM Template
+        run: |
+          echo "Exporting ADF ARM template from sandbox"
+          npm run start export ./src/adf ${{ vars.sbx_data_factory }} adf_export
+
+      - name: Stop ADF triggers
+        shell: pwsh
+        run: ./.deployment/scripts/PrePostDeploymentScript.ps1 -ResourceGroupName ${{ vars.resource_group }} -DataFactoryName ${{ vars.data_factory }} -preDeployment $true -armTemplate './adf_export/ARMTemplateForFactory.json'
+
+      - name: Wait for running jobs
+        shell: pwsh
+        run: ./.deployment/scripts/WaitForRunningPipelinesToComplete.ps1 -ResourceGroupName ${{ vars.resource_group }} -DataFactoryName ${{ vars.data_factory }} 
+
+      - name: Deploy ADF
+        run: |
+          exportFolder="./adf_export"
+
+          az deployment group create \
+            --resource-group ${{ vars.resource_group }} \
+            --template-file "$exportFolder/ARMTemplateForFactory.json" \
+            --parameters @"${{ env.deployment_params }}"
+
+      - name: Post deployment cleanup
+        shell: pwsh
+        run: ./.deployment/scripts/PrePostDeploymentScript.ps1 -ResourceGroupName ${{ vars.resource_group }} -DataFactoryName ${{ vars.data_factory }} -preDeployment $false -armTemplate './adf_export/ARMTemplateForFactory.json'
+
+      - name: Restart Triggers
+        shell: pwsh
+        run: ./.deployment/scripts/ResetTriggers.ps1 -ResourceGroupName ${{ vars.resource_group }} -DataFactoryName ${{ vars.data_factory }} -TriggerConfig ${{ env.trigger_config}}
+```
+
+## Login to azure
+
+```yaml
+- name: Login to Azure
+        uses: azure/login@v2
+        with: 
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+```          
+
+This one is pretty simple. Since we have set up a Managed Identity in Azure with federated credentials, we can use the `azure/login@v2` action to create a session with that Managed Identity. We also need to enable the `AZPSSession`, since we're using Azure PowerShell scripts.
+
+
+## Export ARM template
+
+```yaml
+- name: Export ARM Template
+        run: |
+          echo "Exporting ADF ARM template from sandbox"
+          npm run start export ./src/adf ${{ vars.sbx_data_factory }} adf_export
+```          
+We're using the Node package [Azure Data Factory Utilities](https://www.npmjs.com/package/@microsoft/azure-data-factory-utilities) to run an export command that pulls down the ARM template. Although it also generates the PrePostDeploymentScript, we prefer to keep our own copy in the repo, so we're only using the ARM template output.
+
+This package also enables some validation for pull request workflows but I'll save that for another article. 
+
+## Stop ADF triggers
+
+```yaml
+- name: Stop ADF triggers
+        shell: pwsh
+        run: |
+        ./.deployment/scripts/PrePostDeploymentScript.ps1 `
+          -ResourceGroupName ${{ vars.resource_group }} `
+          -DataFactoryName ${{ vars.data_factory }} `
+          -preDeployment $true `
+          -armTemplate './adf_export/ARMTemplateForFactory.json'
+```
+
+We're using version 1 of the PrePostDeploymentScript to stop ADF triggers. Version 1 stops all triggers, while version 2 only stops triggers it detects as changed. It's also simpler and easier to work with if you need to edit or extend the script.
+
+## Wait for running jobs
+```yaml
+- name: Wait for running jobs
+        shell: pwsh
+        run: |
+         ./.deployment/scripts/WaitForRunningPipelinesToComplete.ps1 `
+            -ResourceGroupName ${{ vars.resource_group }} `
+            -DataFactoryName ${{ vars.data_factory }} 
+```        
+
+This script queries for any running pipelines and waits until there are none. It's hardcoded to look at a 24-hour window, so if your jobs run longer than a day, you'll likely need to consider a more manual release window mechanism.
+
+```ps1
+param(
+    [string]$ResourceGroupName,
+    [string]$DataFactoryName,
+    [int]$PollIntervalSeconds = 30
+)
+
+# Start time (how far back to look)
+$startTime = (Get-Date).AddDays(-1).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+$endTime = (Get-Date).AddHours(1).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+do {
+
+    $runningPipelines = az datafactory pipeline-run query-by-factory `
+        --resource-group $ResourceGroupName `
+        --factory-name $DataFactoryName `
+        --last-updated-after $startTime `
+        --last-updated-before $endTime `
+        --filters operand="Status" operator="Equals" values="InProgress" `
+        --query "value[].{PipelineName:pipelineName, RunId:runId}" `
+        --output json | ConvertFrom-Json
+
+    if ($runningPipelines) {
+        Write-Host "Still running:" -ForegroundColor Yellow
+        $runningPipelines | Format-Table -AutoSize
+        Start-Sleep -Seconds $PollIntervalSeconds
+    }
+} while ($runningPipelines)
+
+Write-Host "No pipelines running. Done." -ForegroundColor Green
+```
+
+## Deploy ADF
+
+```yaml
+  - name: Deploy ADF
+        run: |
+          exportFolder="./adf_export"
+
+          az deployment group create \
+            --resource-group ${{ vars.resource_group }} \
+            --template-file "$exportFolder/ARMTemplateForFactory.json" \
+            --parameters @"${{ env.deployment_params }}"
+```
+
+This is a fairly straightforward step where we deploy the arm template we exported earlier. The key takeaways are 
+
+1. `ARMTemplateForFactory.json` - the name which the node module uses
+1. We provide all parameters instead of providing an overload of a few parameters.
+1. The deployment command is a generic ARM deployment & not specific to ADF.
+
+It's also worth mentioning this one is using bash shell instead of powershell, hence the backslash instead of dash for multiline.
+
+## Restart ADF Triggers
+
+```yaml
+- name: Restart Triggers
+        shell: pwsh
+        run: |
+         ./.deployment/scripts/ResetTriggers.ps1 `
+            -ResourceGroupName ${{ vars.resource_group }} `
+            -DataFactoryName ${{ vars.data_factory }} `
+            -TriggerConfig ${{ env.trigger_config}}
+```
+
+This script uses a configuration file of the following format to enable/disable triggers based on the environment we're deploying to. 
+
+```json
+{
+    "enabled": [
+        "sample-trigger-on"
+    ],
+    "disabled": [
+        "sample-trigger-off"
+    ]  
+}
+```
+
+In this scenario `sample-trigger-on` and `sample-trigger-off` are the names of triggers defined in ADF. As the name suggests the script will start/stop the respective triggers. 
+
+By configuring environment-specific settings (e.g., dev, test, pre-prod, prod), we can manage trigger states based on the environment. This approach helps when dealing with resource-heavy pipelines: triggers remain enabled in higher environments as needed, but in lower environments, they’re only activated during specific test windows to optimize resource usage.
+
+```ps1
+param(
+    [string]$ResourceGroupName,
+    [string]$DataFactoryName,
+    [string]$TriggerConfig
+)
+
+# Read the JSON file
+$triggers = Get-Content $TriggerConfig | ConvertFrom-Json
+
+foreach ($trigger in $triggers.enabled) {
+    Write-Host "Enabling trigger: $trigger"
+    az datafactory trigger start `
+        --resource-group $ResourceGroupName `
+        --factory-name $DataFactoryName `
+        --name $trigger
+}
+    
+# Disable triggers from the "disabled" list
+foreach ($trigger in $triggers.disabled) {
+    Write-Host "Disabling trigger: $trigger"
+    az datafactory trigger stop `
+        --resource-group $ResourceGroupName `
+        --factory-name $DataFactoryName `
+        --name $trigger
+}    
+    
+Write-Host "Trigger processing complete."
+```
+
+# 💡 Conclusion
+
+The combination of infrastructure and software makes the deployment of ADF more complicated than you might initially expect. In this article, I've outlined all the steps separately to clarify their functions. In practice, it would make sense to wrap the deployment steps into a single orchestration PowerShell/Bash script. This would simplify the workflow to just two steps: login and deploy.
+

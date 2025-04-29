@@ -19,7 +19,7 @@ In this post, we'll explore things to be aware of when automating the deployment
 
 <Aside title="ADF" type="note">
 
-When talking about ADF, the details of this post does not take into consideration Fabric and any differences that Fa might introduce.
+When talking about ADF, the details of this post does not take into consideration Fabric and any differences that Fabric might introduce.
 
 </Aside>
 <br/>
@@ -88,6 +88,7 @@ In order to ensure that triggers are enabled/disabled based on environments you'
 Now that we've looked at the common pitfalls with ADF deployment, let's break down the steps and the order they should happen in
 
 1. Log in using an identity with the necessary permissions to deploy ADF (either Contributor or a custom role), preferably using federated credentials tied to your workflow or environment.
+1. Export the ARM template from ADF.
 1. Stop all ADF triggers.
 1. Ensure no pipelines are running in ADF.
 1. Deploy ADF. 
